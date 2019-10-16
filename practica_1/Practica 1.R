@@ -26,8 +26,10 @@ source("get_data_soilgrids.R")
 source("https://raw.githubusercontent.com/jrodriguez88/aquacrop-R/master/make_soil_aquacrop.R", encoding = "UTF-8")
 source("https://raw.githubusercontent.com/jrodriguez88/aquacrop-R/master/make_weather_aquacrop.R", encoding = "UTF-8")
 
-### 2 Definir directorio de trabajo, y zona de estudio
-directorio <- getwd()  
+### 2 Definir directorio de trabajo y resultados, y zona de estudio
+directorio <- paste0(getwd(), "/practica1/") 
+directorio_resultados <- paste0(directorio, "/data/")
+
 #https://power.larc.nasa.gov/docs/v1/
 variables_clima <- c("PRECTOT", 
                      "ALLSKY_SFC_SW_DWN", 
@@ -47,6 +49,7 @@ fecha_final <- 20181231
 localidad <- "Motupe"
 latitud <- -6.1139
 longitud <- -79.6692
+altitud <- 120
 
 ####################
 
@@ -64,9 +67,8 @@ skim(datos_suelo_crudos)
 ### Cambiar identificador NA
 datos_clima_crudos <- datos_clima_crudos %>% replace_with_na_all(condition = ~.x == -99)
 
-### Cambiemos esos  nombres
+### Cambiemos esos  nombres feos
 names(datos_clima_crudos)
-
 names(datos_clima_crudos) <- c("date", "srad", "rain", "rhum", "tmax", "tmin", "wvel")
 skim(datos_clima_crudos)
 
@@ -77,20 +79,24 @@ skim(datos_clima_crudos)
 #mutate
 #summarise
 
-### Ejemplo usando el paquete sirad para calcular radiacion 
+###################   OBTENIENDO DATOS FINALES PARA CONVERSION
+
 datos_clima <- datos_clima_crudos %>%
   mutate(extraT = extrat(lubridate::yday(date), radians(latitud))$ExtraTerrestrialSolarRadiationDaily,
          srad = if_else(is.na(srad), 0.175*sqrt(tmax - tmin)*extraT, srad)) %>%
   dplyr::select(-extraT) %>% basic_qc_nasa
   
 
-
-
-
 datos_suelo <- from_soilgrids_to_aquacrop(localidad, datos_suelo_crudos)
 
 
-#pmap(datos_suelo, make_soil_aquacrop)
+########### CREAR AMBIENTES DE CAMPO PARA AQUACROP
+
+make_weather_aquacrop(directorio_resultados, localidad, datos_clima, latitud, altitud)
+make_soil_aquacrop(directorio_resultados, localidad, datos_suelo$data, datos_suelo$CN, datos_suelo$REW)
+
+
+########### CREAR AMBIENTES DE CAMPO PARA ORYZA
 
 
 
