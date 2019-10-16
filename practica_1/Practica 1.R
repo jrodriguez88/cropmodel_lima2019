@@ -27,7 +27,7 @@ source("https://raw.githubusercontent.com/jrodriguez88/aquacrop-R/master/make_so
 source("https://raw.githubusercontent.com/jrodriguez88/aquacrop-R/master/make_weather_aquacrop.R", encoding = "UTF-8")
 
 ### 2 Definir directorio de trabajo y resultados, y zona de estudio
-directorio <- paste0(getwd(), "/practica1/") 
+directorio <- paste0(getwd(), "/practica_1/") 
 directorio_resultados <- paste0(directorio, "/data/")
 
 #https://power.larc.nasa.gov/docs/v1/
