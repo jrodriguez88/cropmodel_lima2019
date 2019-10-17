@@ -1,4 +1,4 @@
-# Script Practice 1
+# Script Practice 1 -  Creacion de Ambientes de cultivo
 # Source of Weather data: NASA Prediction Of Worldwide Energy Resources https://power.larc.nasa.gov/
 # Source of soil data: https://www.soilgrids.org/  
 # Author: Rodriguez-Espinoza J.
@@ -96,8 +96,26 @@ make_weather_aquacrop(directorio_resultados, localidad, datos_clima, latitud, al
 make_soil_aquacrop(directorio_resultados, localidad, datos_suelo$data, datos_suelo$CN, datos_suelo$REW)
 
 
-########### CREAR AMBIENTES DE CAMPO PARA ORYZA
+########### Graficar clima
+datos_clima %>%  
+  group_by(year = year(date), month = month(date)) %>%
+  summarise(rain = sum(rain), 
+            tmin = mean(tmin), 
+            tmax = mean(tmax), 
+            srad = mean(srad), 
+            rhum = mean(rhum),
+            wvel = mean(wvel)) %>% #write.csv("climate_data_monthly.csv")
+  ungroup() %>% gather(var, value, -c(year, month)) %>%
+  ggplot(aes(factor(month), value)) + 
+  geom_boxplot() + 
+  facet_wrap(~var, scales = "free") + 
+  labs(x = "month", title = "monthly summary") +
+  theme_bw()
 
+
+### Guardar datos clima
+
+write_csv(data, paste0(directorio_resultados, "datos_clima.csv"))
 
 
 
